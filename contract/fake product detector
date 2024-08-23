@@ -1,1 +1,43 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ProductAuthentication {
+
+    // Structure to store product information
+    struct Product {
+        string name;
+        string manufacturer;
+        string serialNumber;
+        uint256 timestamp;
+    }
+
+    // Mapping from serial number to product information
+    mapping(string => Product) private products;
+
+    // Event to log the addition of a new product
+    event ProductAdded(string serialNumber, string name, string manufacturer, uint256 timestamp);
+
+    // Function to register a new product
+    function registerProduct(string memory _name, string memory _manufacturer, string memory _serialNumber) public {
+        require(bytes(products[_serialNumber].serialNumber).length == 0, "Product with this serial number already exists.");
+        
+        products[_serialNumber] = Product({
+            name: _name,
+            manufacturer: _manufacturer,
+            serialNumber: _serialNumber,
+            timestamp: block.timestamp
+        });
+
+        emit ProductAdded(_serialNumber, _name, _manufacturer, block.timestamp);
+    }
+
+    // Function to verify a product
+    function verifyProduct(string memory _serialNumber) public view returns (string memory name, string memory manufacturer, uint256 timestamp) {
+        Product memory product = products[_serialNumber];
+        
+        require(bytes(product.serialNumber).length != 0, "Product does not exist.");
+
+        return (product.name, product.manufacturer, product.timestamp);
+    }
+}
 
